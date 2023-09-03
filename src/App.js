@@ -1,6 +1,12 @@
+import { useState } from 'react';
 import './index.scss';
 
 const questions = [
+  {
+    title: 'Что такое useState?',
+    variants: ['Это функция для хранения данных компонента', 'Это глобальный стейт', 'Это когда на ты никому не нужен'],
+    correct: 1,
+  },
   {
     title: 'React - это ... ?',
     variants: ['библиотека', 'фреймворк', 'приложение'],
@@ -22,37 +28,54 @@ const questions = [
   },
 ];
 
-function Result() {
+function Result({ correct }) {
   return (
     <div className="result">
       <img src="https://cdn-icons-png.flaticon.com/512/2278/2278992.png" />
-      <h2>Вы отгадали 3 ответа из 10</h2>
-      <button>Попробовать снова</button>
+      <h2>Вы отгадали {correct} ответа из {questions.length}</h2>
+      <a href='/'>
+        <button>Попробовать снова</button>
+      </a>
     </div>
   );
 }
 
-function Game() {
+function Game({ question, procent, onClickVar }) {
   return (
     <>
       <div className="progress">
-        <div style={{ width: '50%' }} className="progress__inner"></div>
+        <div style={{ width: `${procent}%` }} className="progress__inner"></div>
       </div>
-      <h1>Что такое useState?</h1>
+      <h1>{question.title}</h1>
       <ul>
-        <li>Это функция для хранения данных компонента</li>
-        <li>Это глобальный стейт</li>
-        <li>Это когда на ты никому не нужен</li>
+        {question.variants.map((v, index) =>
+          <li key={v} onClick={() => onClickVar(index)}>{v}</li>
+        )}
       </ul>
     </>
   );
 }
 
 function App() {
+
+  const [step, setStep] = useState(0);
+  const question = questions[step];
+  const [correct, setCorrect] = useState(0);
+
+  const onClickVar = (i) => {
+    console.log(step, i);
+    setStep(step + 1)
+    if (question.correct == i) setCorrect(correct + 1);
+  }
+
   return (
     <div className="App">
-      <Game />
-      {/* <Result /> */}
+      {step !== questions.length
+        ?
+        <Game question={question} procent={Math.ceil(step * 100 / questions.length)} onClickVar={onClickVar} />
+        :
+        <Result correct={correct} />
+      }
     </div>
   );
 }
